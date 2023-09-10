@@ -18,7 +18,6 @@ async function run() {
     const matchCommit = getInput('match-commit')
     const octokit = getOctokit(myToken)
     const { owner, repo } = context.repo
-    const regexp = /^[.A-Za-z0-9_/-]*$/
 
     if (!headRef) {
       headRef = context.sha
@@ -59,12 +58,7 @@ async function run() {
     console.log(`head-ref: ${headRef}`)
     console.log(`base-ref: ${baseRef}`)
 
-    if (
-      !!headRef &&
-      !!baseRef &&
-      regexp.test(headRef) &&
-      regexp.test(baseRef)
-    ) {
+    if (!!headRef && !!baseRef) {
       getChangelog(
         headRef,
         baseRef,
