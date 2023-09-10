@@ -1,6 +1,7 @@
 import { getInput, setFailed, setOutput } from '@actions/core'
 import { exec as _exec } from '@actions/exec'
 import { getOctokit, context } from '@actions/github'
+import { isMatch } from 'micromatch'
 
 const src = __dirname
 
@@ -11,6 +12,8 @@ async function run() {
     const myToken = getInput('myToken')
     const reverse = getInput('reverse')
     const fetch = getInput('fetch')
+    const matchTag = getInput('match-tag')
+    const matchCommit = getInput('match-commit')
     const octokit = new getOctokit(myToken)
     const { owner, repo } = context.repo
     const regexp = /^[.A-Za-z0-9_/-]*$/
@@ -20,16 +23,34 @@ async function run() {
     }
 
     if (!baseRef) {
-      const latestRelease = await octokit.rest.repos.getLatestRelease({
-        owner: owner,
-        repo: repo
-      })
-      if (latestRelease) {
-        baseRef = latestRelease.data.tag_name
+      if (!matchTag) {
+        const latestRelease = await octokit.rest.repos.getLatestRelease({
+          owner: owner,
+          repo: repo
+        })
+        if (latestRelease) {
+          baseRef = latestRelease.data.tag_name
+        } else {
+          setFailed(
+            `There are no releases on ${owner}/${repo}. Tags are not releases.`
+          )
+        }
       } else {
-        setFailed(
-          `There are no releases on ${owner}/${repo}. Tags are not releases.`
+        const releases = await octokit.rest.repos.listReleases({
+          owner,
+          repo
+        })
+
+        const latestRelease = releases.data.find(release =>
+          isMatch(release.tag_name, matchTag)
         )
+        if (latestRelease) {
+          baseRef = latestRelease.data.tag_name
+        } else {
+          setFailed(
+            `There are no releases on ${owner}/${repo} with match tag ${matchTag}. Tags are not releases.`
+          )
+        }
       }
     }
 
@@ -42,7 +63,14 @@ async function run() {
       regexp.test(headRef) &&
       regexp.test(baseRef)
     ) {
-      getChangelog(headRef, baseRef, owner + '/' + repo, reverse, fetch)
+      getChangelog(
+        headRef,
+        baseRef,
+        owner + '/' + repo,
+        reverse,
+        fetch,
+        matchCommit
+      )
     } else {
       setFailed(
         'Branch names must contain only numbers, strings, underscores, periods, forward slashes, and dashes.'
@@ -53,7 +81,14 @@ async function run() {
   }
 }
 
-async function getChangelog(headRef, baseRef, repoName, reverse, fetch) {
+async function getChangelog(
+  headRef,
+  baseRef,
+  repoName,
+  reverse,
+  fetch,
+  matchCommit
+) {
   try {
     let output = ''
     let err = ''
@@ -77,6 +112,11 @@ async function getChangelog(headRef, baseRef, repoName, reverse, fetch) {
     )
 
     if (output) {
+      if (matchCommit)
+        output = output
+          .split('\n')
+          .filter(item => isMatch(item, matchCommit))
+          .join('\n')
       console.log(
         '\x1b[32m%s\x1b[0m',
         `Changelog between ${baseRef} and ${headRef}:\n${output}`

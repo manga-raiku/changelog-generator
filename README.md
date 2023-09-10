@@ -36,6 +36,11 @@ Whether this action should pull in all other branches and tags. Default: 'true'
 
 Markdown formatted changelog.
 
+### `match-tag`
+
+The tag that matched the base release tag. Default: '*'
+This is really useful when you store multiple releases in your repo. For example if you have both `ios@*` and `android@*` tags in the repo you can specify `ios@*` so that it includes useful changes instead of commits from release `android@`
+
 ## Example usage
 
 There are two blocks you will need:
