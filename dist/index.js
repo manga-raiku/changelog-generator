@@ -15215,6 +15215,8 @@ __nccwpck_require__.r(__webpack_exports__);
 /* harmony import */ var _actions_github__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__nccwpck_require__.n(_actions_github__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var micromatch__WEBPACK_IMPORTED_MODULE_3__ = __nccwpck_require__(8312);
 /* harmony import */ var micromatch__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__nccwpck_require__.n(micromatch__WEBPACK_IMPORTED_MODULE_3__);
+// @ts-check
+
 
 
 
@@ -15231,7 +15233,7 @@ async function run() {
     const fetch = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('fetch')
     const matchTag = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('match-tag')
     const matchCommit = (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.getInput)('match-commit')
-    const octokit = new _actions_github__WEBPACK_IMPORTED_MODULE_2__.getOctokit(myToken)
+    const octokit = (0,_actions_github__WEBPACK_IMPORTED_MODULE_2__.getOctokit)(myToken)
     const { owner, repo } = _actions_github__WEBPACK_IMPORTED_MODULE_2__.context.repo
     const regexp = /^[.A-Za-z0-9_/-]*$/
 
@@ -15262,7 +15264,7 @@ async function run() {
           (0,micromatch__WEBPACK_IMPORTED_MODULE_3__.isMatch)(release.tag_name, matchTag)
         )
         if (latestRelease) {
-          baseRef = latestRelease.data.tag_name
+          baseRef = latestRelease.tag_name
         } else {
           (0,_actions_core__WEBPACK_IMPORTED_MODULE_0__.setFailed)(
             `There are no releases on ${owner}/${repo} with match tag ${matchTag}. Tags are not releases.`
