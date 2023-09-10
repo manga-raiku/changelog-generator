@@ -1,5 +1,5 @@
-name: 'Get a changelog between two references'
-author: 'Chad Metcalf'
+name: 'Get a changelog between two references patch'
+author: 'Chad Metcalf & Raiku'
 description: 'Returns the commit difference count between two git references.'
 inputs:
   mytoken:
@@ -21,6 +21,14 @@ inputs:
   fetch:
     description: 'Whether to have this action fetch all other branches and tags'
     default: 'true'
+    required: false
+  match-tag:
+    description: 'Match tag'
+    default: '*'
+    required: false
+  match-commit:
+    description: 'Match commit'
+    default: '*'
     required: false
 outputs:
   changelog:
