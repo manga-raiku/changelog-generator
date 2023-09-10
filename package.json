@@ -1,5 +1,5 @@
 {
-  "name": "@tachibana-shinchangelog-generator",
+  "name": "@manga-raiku/changelog-generator",
   "version": "4.1.0",
   "description": "A GitHub Action that compares the commit differences between two branches",
   "main": "dist/index.js",
